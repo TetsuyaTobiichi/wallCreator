@@ -32,24 +32,39 @@ public class NewBehaviourScript : MonoBehaviour
         if (currentWall != null) // Если есть активная стена, обновляем конечную точку
         {
             Vector3 endPosition = GetMouseWorldPosition();
-            currentWall.Initialize(currentWall.startPoint, endPosition);//аналогичное обновление как при завершении, для видимости, куда пойдет стена
+            //пока не получается привязка, нужно решить вопрос с коллизией либо найти другое решение
+            Collision op = currentWall.collisinObject;
+            switch(op){
+                case null:
+                currentWall.Initialize(currentWall.startPoint, endPosition);//аналогичное обновление как при завершении, для видимости, куда пойдет стена
+                break;
+                case Collision:
+                Debug.Log("self col");
+                OnCollisionEnter(currentWall.collisinObject);
+                break;
+            }
+            
+            
         }
     }
+    
     //придумать как проверять коллизию стен в контроллере, добавить проверку на расстояние, чтобы привязка была только при колизии с концами стен
-    void OnCollisionEnter(Collision col)
+    private void OnCollisionEnter(Collision col)
     {
-        Debug.Log("enter");
-        wall collisionWall = col.gameObject.GetComponent<wall>();
-     
-        Vector3 endPoint =collisionWall.endPoint;
-        Vector3 startPoint =collisionWall.startPoint;
+        if (col!=null){ 
+            Debug.Log("enter");
+            wall collisionWall = col.gameObject.GetComponent<wall>();
+        
+            Vector3 endPoint =collisionWall.endPoint;
+            Vector3 startPoint =collisionWall.startPoint;
 
-        if(Vector3.Distance(currentWall.startPoint, endPoint)<Vector3.Distance(currentWall.startPoint, startPoint)){
+            if(Vector3.Distance(currentWall.startPoint, endPoint)<Vector3.Distance(currentWall.startPoint, startPoint)){
 
-            currentWall.Initialize(currentWall.startPoint, endPoint);
-        }
-        else{
-            currentWall.Initialize(currentWall.startPoint, startPoint);
+                currentWall.Initialize(currentWall.startPoint, endPoint);
+            }
+            else{
+                currentWall.Initialize(currentWall.startPoint, startPoint);
+            }
         }
     }
 
