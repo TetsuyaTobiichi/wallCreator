@@ -10,6 +10,7 @@ public class NewBehaviourScript : MonoBehaviour
     void Update()
     {
         
+       
         if (Input.GetMouseButtonDown(0)) // ЛКМ для начала/завершения стены
         {
             Vector3 clickPosition = GetMouseWorldPosition();
@@ -24,48 +25,46 @@ public class NewBehaviourScript : MonoBehaviour
             else
             {
                 // Завершаем стену
+                currentWall.name = "wall";
                 currentWall.Initialize(currentWall.startPoint, clickPosition);//начальная точка из класса стены и конечное место клика
+                
+                Debug.Log(currentWall.startPoint+"начало"+ clickPosition+"конец");
                 currentWall = null;
+                
             }
+        }
+        //работает, дополнить надо
+        else if (Input.GetMouseButtonDown(1)&currentWall.collisionWall!=null){
+            if(currentWall.collisionWall!=null) ConnectNearWall(currentWall.collisionWall);
+            
         }
 
         if (currentWall != null) // Если есть активная стена, обновляем конечную точку
         {
             Vector3 endPosition = GetMouseWorldPosition();
-            //пока не получается привязка, нужно решить вопрос с коллизией либо найти другое решение
-            Collision op = currentWall.collisinObject;
-            switch(op){
-                case null:
-                currentWall.Initialize(currentWall.startPoint, endPosition);//аналогичное обновление как при завершении, для видимости, куда пойдет стена
-                break;
-                case Collision:
-                Debug.Log("self col");
-                OnCollisionEnter(currentWall.collisinObject);
-                break;
-            }
-            
-            
+            currentWall.Initialize(currentWall.startPoint, endPosition);//аналогичное обновление как при завершении, для видимости, куда пойдет стена
         }
     }
     
-    //придумать как проверять коллизию стен в контроллере, добавить проверку на расстояние, чтобы привязка была только при колизии с концами стен
-    private void OnCollisionEnter(Collision col)
+    //придумать как проверять коллизию стен в контроллере, добавить проверку на расстояние, чтобы привязка была только при колизии с концами стен!!!!!!!!!!!!!!!!!!!!!!!
+    private void ConnectNearWall(wall collisionWall)
     {
-        if (col!=null){ 
-            Debug.Log("enter");
-            wall collisionWall = col.gameObject.GetComponent<wall>();
-        
-            Vector3 endPoint =collisionWall.endPoint;
-            Vector3 startPoint =collisionWall.startPoint;
+       
+        Vector3 endPoint =collisionWall.endPoint;
+        Vector3 startPoint =collisionWall.startPoint;
 
-            if(Vector3.Distance(currentWall.startPoint, endPoint)<Vector3.Distance(currentWall.startPoint, startPoint)){
+        Debug.Log(startPoint+"начало коллиз"+ endPoint+"конец коллиз");
 
-                currentWall.Initialize(currentWall.startPoint, endPoint);
-            }
-            else{
-                currentWall.Initialize(currentWall.startPoint, startPoint);
-            }
+        if(Vector3.Distance(currentWall.endPoint, endPoint)<1f){
+            Debug.Log(Vector3.Distance(currentWall.endPoint, endPoint));
+            currentWall.Initialize(currentWall.startPoint,endPoint);
         }
+        else if(Vector3.Distance(currentWall.endPoint, startPoint)<1f){
+            Debug.Log(Vector3.Distance(currentWall.startPoint, startPoint));
+            currentWall.Initialize(currentWall.startPoint,startPoint);
+        }
+                
+        currentWall=null;
     }
 
     
